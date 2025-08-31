@@ -1,0 +1,45 @@
+# macOS
+.DS_Store
+
+# Node / package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / artifacts
+dist/
+build/
+out/
+coverage/
+.tmp/
+.temp/
+
+# Editors / IDE
+.vscode/
+.idea/
+.cursor/
+
+# Chrome extension packaging
+*.crx
+*.pem
+*.zip
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Local tooling / assistants
+.serena/
+.roo/
+.gemini/
+
+
+
+
+
+
+
+

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Page Summarizer</title>
+  <style>
+    /* CSS変数（カラーパレット） */
+    :root {
+      --primary-color: #667eea;
+      --primary-dark: #5a67d8;
+      --secondary-color: #764ba2;
+      --accent-color: #f093fb;
+      --background: #ffffff;
+      --surface: #f8fafc;
+      --surface-hover: #f1f5f9;
+      --text-primary: #1a202c;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --border-color: #e2e8f0;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+      --warning-color: #f59e0b;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+    }
+
+    /* 1. 基本設定 */
+    * {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      width: 1200px;
+      height: 800px;
+      min-width: 800px;
+      min-height: 600px;
+      max-width: 1400px;
+      max-height: 1000px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      resize: both;
+    }
+
+    /* 2. ヘッダー部分（上部） */
+    .header {
+      background: var(--background);
+      padding: 20px;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 3. メインコンテンツ（中央・スクロール部分） */
+    .main-content {
+      background: var(--background);
+      margin: 20px;
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      flex-grow: 1;
+      overflow-y: auto;
+      line-height: 1.6;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    /* カスタムスクロールバー */
+    .main-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .main-content::-webkit-scrollbar-track {
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+    }
+    
+    .main-content::-webkit-scrollbar-thumb {
+      background: var(--text-muted);
+      border-radius: var(--radius-sm);
+    }
+    
+    .main-content::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* 4. フッター部分（下部） */
+    .footer {
+      background: var(--background);
+      padding: 16px 20px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      box-shadow: var(--shadow-md);
+      flex-shrink: 0;
+      margin: 0 16px 16px 16px;
+    }
+
+    /* 5. タイポグラフィ */
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin: 8px 0;
+    }
+
+    /* 6. ボタンスタイル */
+    button {
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover:before {
+      left: 100%;
+    }
+
+    .primary-button {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 12px 24px;
+      width: 100%;
+      box-shadow: var(--shadow-md);
+    }
+
+    .primary-button:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .primary-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary-button {
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      padding: 10px 20px;
+    }
+
+    .secondary-button:hover {
+      background: var(--surface-hover);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    .tts-controls, #export-controls { 
+      display: flex; 
+      gap: 12px; 
+      margin-top: 16px;
+    }
+
+    .icon-button {
+      padding: 10px;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    /* 7. タブ切り替えスタイル */
+    .tab-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: var(--surface);
+      padding: 4px;
+      border-radius: var(--radius-lg);
+    }
+    
+    .tab-button {
+      flex: 1;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      position: relative;
+      width: auto;
+    }
+    
+    .tab-button.active {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    
+    .tab-button:hover:not(.active) {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 8. チャット機能のスタイル */
+    .chat-section {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-messages {
+      flex-grow: 1;
+      max-height: 380px;
+      min-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      border: 2px solid var(--border-color);
+    }
+    
+    .chat-message {
+      margin-bottom: 16px;
+      max-width: 80%;
+      word-wrap: break-word;
+      animation: slideIn 0.3s ease-out;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .chat-message.user {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg) var(--radius-lg) var(--radius-md) var(--radius-lg);
+      margin-left: auto;
+      margin-right: 0;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .chat-message.assistant {
+      background: var(--background);
+      color: var(--text-primary);
+      padding: 16px 20px;
+      border-radius: var(--radius-lg) var(--radius-lg) var(--radius-lg) var(--radius-md);
+      border: 2px solid var(--border-color);
+      margin-left: 0;
+      margin-right: auto;
+      position: relative;
+    }
+
+    .chat-message.assistant:before {
+      content: '🤖';
+      position: absolute;
+      left: -8px;
+      top: -8px;
+      background: var(--background);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border: 2px solid var(--border-color);
+    }
+
+    /* 13. チャットメッセージのTTSコントロール */
+    .chat-message.assistant {
+      padding-right: 60px;
+    }
+
+    .message-tts-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+
+    .message-tts-btn:hover {
+      background: var(--primary-color);
+      color: white;
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+      border-color: var(--primary-color);
+    }
+
+    .chat-message:hover .message-tts-btn {
+      opacity: 1;
+    }
+    
+    .chat-input-area {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+      background: var(--surface);
+      padding: 20px;
+      border-radius: var(--radius-lg);
+      border: 2px solid var(--border-color);
+    }
+    
+    #chat-input {
+      flex-grow: 1;
+      padding: 16px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      font-size: 16px;
+      background: var(--background);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      min-height: 24px;
+    }
+
+    #chat-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    #chat-send {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      padding: 16px 24px;
+      border-radius: var(--radius-lg);
+      font-weight: 600;
+      width: auto;
+      min-width: 100px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+      font-size: 16px;
+    }
+
+    #chat-send:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    #chat-send:disabled {
+      opacity: 0.5;
+      transform: none;
+      cursor: not-allowed;
+    }
+
+    /* 9. 状態表示 */
+    #status {
+      background: var(--surface);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    #model-info {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .tts-status {
+      background: var(--surface);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      margin-top: 8px;
+    }
+
+    .tts-status.success {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--success-color);
+      color: var(--success-color);
+    }
+
+    .tts-status.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--error-color);
+      color: var(--error-color);
+    }
+
+    .tts-status.info {
+      background: rgba(102, 126, 234, 0.1);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* 10. デタッチボタンとヘッダーレイアウト */
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .detach-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      color: var(--text-secondary);
+      border: 2px solid var(--border-color);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .detach-button:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: rotate(45deg) scale(1.1);
+      border-color: var(--primary-color);
+    }
+
+    /* 11. レスポンシブレイアウト改善 */
+    .chat-messages {
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .chat-message {
+      margin-bottom: 8px;
+      padding: 10px 14px;
+    }
+
+    .chat-input-area {
+      padding: 12px;
+    }
+
+    #chat-input {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
+
+    #chat-send {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+
+    /* 12. コンパクトなボタンレイアウト */
+    .tab-buttons {
+      margin-bottom: 16px;
+    }
+
+    .tab-button {
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    /* 13. リサイズ機能 */
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(-45deg, transparent 0%, transparent 30%, var(--text-muted) 30%, var(--text-muted) 35%, transparent 35%, transparent 65%, var(--text-muted) 65%, var(--text-muted) 70%, transparent 70%);
+      cursor: nw-resize;
+      z-index: 1000;
+      border-radius: 0 0 var(--radius-lg) 0;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+    }
+
+    .resize-handle:hover {
+      opacity: 1;
+      background: linear-gradient(-45deg, transparent 0%, transparent 25%, var(--primary-color) 25%, var(--primary-color) 30%, transparent 30%, transparent 60%, var(--primary-color) 60%, var(--primary-color) 65%, transparent 65%);
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 900px) {
+      .chat-messages {
+        max-height: 300px;
+        min-height: 250px;
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .chat-messages {
+        max-height: 500px;
+        min-height: 400px;
+      }
+      
+      .main-content {
+        padding: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="header-top">
+      <h3>✨ AI Page Assistant</h3>
+      <button id="detach-btn" class="detach-button" title="独立ウィンドウで開く">🔗</button>
+    </div>
+    
+    <!-- タブ切り替えボタン -->
+    <div class="tab-buttons">
+      <button class="tab-button active" id="summary-tab">📄 要約</button>
+      <button class="tab-button" id="chat-tab">💬 チャット</button>
+    </div>
+    
+    <button id="summarize-btn" class="primary-button">🚀 要約を開始</button>
+    <p id="status"></p>
+    <p id="model-info"></p>
+    <p id="tts-status" class="tts-status" style="display: none;"></p>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <div class="main-content">
+    <!-- 要約タブ -->
+    <div id="summary-content" class="tab-content active">
+      <div id="summary"></div>
+    </div>
+    
+    <!-- チャットタブ -->
+    <div id="chat-content" class="tab-content">
+      <div class="chat-section">
+        <div id="chat-messages" class="chat-messages">
+          <div class="chat-message assistant">
+            このページの内容について何でも質問してください！
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" placeholder="ページについて質問する..." />
+          <button id="chat-send">送信</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- フッター -->
+  <div class="footer">
+    <div id="tts-controls" class="tts-controls" style="display: none;">
+      <button id="play-btn" class="secondary-button icon-button">🔊</button>
+      <button id="stop-btn" class="secondary-button icon-button" style="display: none;">⏹️</button>
+    </div>
+    <p id="slack-status"></p>
+  </div>
+
+  <!-- リサイズハンドル -->
+  <div class="resize-handle" title="ドラッグしてサイズを調整"></div>
+
+  <script src="showdown.min.js"></script> 
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>設定</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      width: 500px;
+      margin: 20px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 15px;
+      width: 100px;
+      align-self: flex-end;
+    }
+    #status {
+      text-align: center;
+      font-weight: bold;
+      height: 20px;
+    }
+    
+    .troubleshooting {
+      margin-top: 30px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .troubleshooting h3 {
+      margin-top: 0;
+      color: #495057;
+      font-size: 18px;
+    }
+    
+    .trouble-section {
+      margin-bottom: 20px;
+    }
+    
+    .trouble-section h4 {
+      color: #6c757d;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    
+    .trouble-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    
+    .trouble-section li {
+      margin-bottom: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    
+    .trouble-section p {
+      font-size: 13px;
+      color: #6c757d;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>設定</h1>
+  <div class="container">
+    <div class="input-group">
+      <label for="openai-key">OpenAI APIキー:</label>
+      <input type="password" id="openai-key" placeholder="sk-...">
+    </div>
+    <div class="input-group">
+      <label for="aivis-key">AIVIS APIキー:</label>
+      <input type="password" id="aivis-key" placeholder="aivis_...">
+    </div>
+    <div class="input-group">
+      <label for="slack-url">Slack Webhook URL:</label>
+      <input type="password" id="slack-url" placeholder="https://hooks.slack.com/services/...">
+    </div>
+    <div class="input-group">
+      <label for="slack-auto">Slack 自動送信</label>
+      <input type="checkbox" id="slack-auto">
+    </div>
+    <div class="input-group">
+      <label for="auto-tts-chat">チャット回答の自動読み上げ</label>
+      <input type="checkbox" id="auto-tts-chat" checked>
+    </div>
+    <div class="input-group">
+      <label for="openai-model">OpenAI モデル:</label>
+      <select id="openai-model">
+        <option value="gpt-5-mini-2025-08-07">gpt-5-mini-2025-08-07 (Default)</option>
+        <option value="gpt-5-2025-08-07">gpt-5-2025-08-07</option>
+      </select>
+    </div>
+    <div class="input-group">
+      <label for="aivis-model">AIVIS 読み上げモデルUUID:</label>
+      <input type="text" id="aivis-model" placeholder="f5017410-fbb5-49e1-97cb-e785f42e15f5">
+    </div>
+    
+    <!-- トラブルシューティング情報 -->
+    <div class="troubleshooting">
+      <h3>🔧 読み上げ機能のトラブルシューティング</h3>
+      <div class="trouble-section">
+        <h4>よくある問題と解決方法：</h4>
+        <ul>
+          <li><strong>「AIVIS APIキーが設定されていません」</strong><br>
+              → 上記のAIVIS APIキーを正しく入力し、保存してください</li>
+          <li><strong>「AIVIS APIキーが無効です」</strong><br>
+              → APIキーが正しいか確認してください。有効期限が切れていないかも確認してください</li>
+          <li><strong>「利用制限に達しました」</strong><br>
+              → しばらく時間を置いてから再試行してください</li>
+          <li><strong>「指定されたモデルが見つかりません」</strong><br>
+              → モデルUUIDが正しいか確認してください。空欄の場合はデフォルトモデルが使用されます</li>
+          <li><strong>「ネットワーク接続を確認してください」</strong><br>
+              → インターネット接続を確認し、ファイアウォール設定も確認してください</li>
+        </ul>
+      </div>
+      
+      <div class="trouble-section">
+        <h4>その他の対処法：</h4>
+        <ul>
+          <li>Chrome拡張機能を一度無効化し、再度有効化してください</li>
+          <li>ブラウザを再起動してください</li>
+          <li>拡張機能を削除して再インストールしてください</li>
+        </ul>
+      </div>
+      
+      <div class="trouble-section">
+        <h4>AIVIS APIキーの取得方法：</h4>
+        <p>AIVIS ProjectのWebサイトにアクセスし、アカウント登録後にAPIキーを取得してください。</p>
+      </div>
+    </div>
+    
+    <div id="status"></div>
+    <button id="save-btn">保存</button>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
