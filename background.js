@@ -7,6 +7,8 @@ let creating; // Offscreen Document作成中のプロミスを管理
 const LMSTUDIO_API_URL = 'http://127.0.0.1:1234/v1/chat/completions'; // LM StudioのAPIエンドポイント
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const CONTEXT_MENU_ID_SUMMARIZE_SELECTION = 'summarize-selection';
+const CONTEXT_MENU_ID_OPEN_SIDEPANEL = 'open-sidepanel';
+const CONTEXT_MENU_ID_OPEN_DETACHED = 'open-detached';
 
 
 // =================================================================
@@ -256,10 +258,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function registerContextMenus() {
   try {
     chrome.contextMenus.removeAll(() => {
+      // 選択範囲の要約メニュー
       chrome.contextMenus.create({
         id: CONTEXT_MENU_ID_SUMMARIZE_SELECTION,
         title: '選択範囲を要約',
         contexts: ['selection']
+      });
+      
+      // サイドパネルを開くメニュー
+      chrome.contextMenus.create({
+        id: CONTEXT_MENU_ID_OPEN_SIDEPANEL,
+        title: 'AI アシスタント (サイドパネル)',
+        contexts: ['page']
+      });
+      
+      // 独立ウィンドウを開くメニュー
+      chrome.contextMenus.create({
+        id: CONTEXT_MENU_ID_OPEN_DETACHED,
+        title: 'AI アシスタント (独立ウィンドウ)',
+        contexts: ['page']
       });
     });
   } catch (e) {
@@ -273,10 +290,11 @@ chrome.runtime.onStartup.addListener(registerContextMenus);
 
 // 右クリックメニューからのクリックを処理
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId !== CONTEXT_MENU_ID_SUMMARIZE_SELECTION) return;
-  if (!tab || !tab.id) return;
-  const selectedText = (info.selectionText || '').trim();
-  if (!selectedText) return;
+  // 選択範囲の要約
+  if (info.menuItemId === CONTEXT_MENU_ID_SUMMARIZE_SELECTION) {
+    if (!tab || !tab.id) return;
+    const selectedText = (info.selectionText || '').trim();
+    if (!selectedText) return;
 
   // アクションポップアップを開く（アイコン押下と同様のUI）
   try {
@@ -294,6 +312,28 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   } catch (e) {
     console.error('Failed to summarize selected text:', e);
     chrome.runtime.sendMessage({ action: 'updateStatus', status: `エラー: ${e.message}` });
+  }
+  
+  // サイドパネルを開く
+  } else if (info.menuItemId === CONTEXT_MENU_ID_OPEN_SIDEPANEL) {
+    try {
+      await chrome.sidePanel.open({ tabId: tab.id });
+    } catch (e) {
+      console.error('Failed to open side panel:', e);
+    }
+  
+  // 独立ウィンドウを開く
+  } else if (info.menuItemId === CONTEXT_MENU_ID_OPEN_DETACHED) {
+    try {
+      await chrome.windows.create({
+        url: 'detached.html',
+        type: 'popup',
+        width: 900,
+        height: 700
+      });
+    } catch (e) {
+      console.error('Failed to open detached window:', e);
+    }
   }
 });
 // =================================================================

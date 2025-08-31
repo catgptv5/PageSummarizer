@@ -8,7 +8,8 @@
     "scripting",
     "storage",
     "offscreen",
-    "contextMenus"
+    "contextMenus",
+    "sidePanel"
   ],
   "host_permissions": [
     "http://localhost:1234/",
@@ -20,6 +21,9 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "ページを要約"
+  },
+  "side_panel": {
+    "default_path": "detached.html"
   },
   "options_page": "options.html",
   "background": {

@@ -34,20 +34,20 @@
     }
     
     html, body {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      min-height: 100vh;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: var(--surface);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
 
     .detached-container {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      flex: 1;
+      min-height: 100vh;
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
       padding: 20px;
     }
@@ -65,7 +65,8 @@
       background: var(--background);
       border-radius: var(--radius-lg);
       padding: 24px;
-      flex-grow: 1;
+      flex: 1;
+      min-height: 0;
       overflow: hidden;
       box-shadow: var(--shadow-lg);
       display: flex;
@@ -152,7 +153,8 @@
     /* チャット部分 */
     .tab-content {
       display: none;
-      flex-grow: 1;
+      flex: 1;
+      min-height: 0;
       overflow: hidden;
     }
     
@@ -162,13 +164,15 @@
     }
 
     .chat-section {
-      height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
     }
     
     .chat-messages {
-      flex-grow: 1;
+      flex: 1;
+      min-height: 0;
       overflow-y: auto;
       margin-bottom: 20px;
       background: var(--surface);
@@ -269,7 +273,8 @@
     #summary {
       line-height: 1.7;
       font-size: 16px;
-      flex-grow: 1;
+      flex: 1;
+      min-height: 0;
       overflow-y: auto;
     }
 
@@ -302,6 +307,191 @@
     
     .chat-messages::-webkit-scrollbar-thumb:hover, #summary::-webkit-scrollbar-thumb:hover {
       background: var(--text-secondary);
+    }
+    
+    /* サイドパネル対応 (320px幅) */
+    @media (max-width: 380px) {
+      html, body {
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        background: var(--background);
+        margin: 0;
+        padding: 0;
+      }
+      
+      .detached-container {
+        padding: 0;
+        height: 100%;
+        min-height: 0;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--background);
+      }
+      
+      .detached-header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border-color);
+        padding: 12px;
+        margin: 0;
+        flex-shrink: 0;
+      }
+      
+      .detached-content {
+        background: var(--background);
+        padding: 8px;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+      
+      .detached-footer {
+        background: var(--surface);
+        border-top: 1px solid var(--border-color);
+        padding: 8px 12px;
+        margin: 0;
+        flex-shrink: 0;
+      }
+      
+      h2 {
+        font-size: 18px;
+        margin: 0 0 12px 0;
+        text-align: center;
+      }
+      
+      .tab-buttons {
+        gap: 4px;
+        margin-bottom: 12px;
+        padding: 2px;
+      }
+      
+      .tab-button {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+      
+      .primary-button {
+        padding: 10px 16px;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+      
+      .chat-section {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      
+      .chat-messages {
+        flex: 1;
+        min-height: 120px;
+        max-height: none;
+        padding: 10px;
+        margin-bottom: 8px;
+        overflow-y: auto;
+      }
+      
+      .chat-message {
+        font-size: 14px;
+        padding: 10px 12px;
+        margin-bottom: 10px;
+      }
+      
+      .chat-input-area {
+        padding: 10px;
+        gap: 8px;
+        flex-shrink: 0;
+      }
+      
+      #chat-input {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      
+      #chat-send {
+        padding: 10px 12px;
+        font-size: 14px;
+        min-width: 70px;
+      }
+      
+      .primary-button {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+      
+      #summary {
+        font-size: 13px;
+        line-height: 1.5;
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+        max-height: none;
+        padding: 8px;
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        margin: 0;
+      }
+      
+      #status {
+        padding: 6px 8px;
+        font-size: 11px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+      }
+      
+      .tab-content {
+        flex: 1;
+        overflow: hidden;
+        display: none;
+        min-height: 0;
+      }
+      
+      .tab-content.active {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* TTS controls for side panel */
+      .tts-controls {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .secondary-button {
+        padding: 6px 10px;
+        font-size: 12px;
+        background: var(--background);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+      }
+      
+      /* 要約内のマークダウン要素のスタイル調整 */
+      #summary ul, #summary ol {
+        margin: 6px 0;
+        padding-left: 16px;
+      }
+      
+      #summary li {
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+      
+      #summary p {
+        margin: 4px 0;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+      
+      #summary h1, #summary h2, #summary h3 {
+        margin: 8px 0 4px 0;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
     }
   </style>
 </head>

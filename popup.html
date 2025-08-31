@@ -34,12 +34,12 @@
     }
     
     html, body {
-      width: 1200px;
-      height: 800px;
-      min-width: 800px;
-      min-height: 600px;
-      max-width: 1400px;
-      max-height: 1000px;
+      width: 420px;
+      height: 600px;
+      min-width: 380px;
+      min-height: 500px;
+      max-width: 600px;
+      max-height: 800px;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -53,7 +53,7 @@
     /* 2. ヘッダー部分（上部） */
     .header {
       background: var(--background);
-      padding: 20px;
+      padding: 16px;
       border-radius: 0 0 var(--radius-lg) var(--radius-lg);
       box-shadow: var(--shadow-md);
       flex-shrink: 0;
@@ -64,9 +64,9 @@
     /* 3. メインコンテンツ（中央・スクロール部分） */
     .main-content {
       background: var(--background);
-      margin: 20px;
+      margin: 16px;
       border-radius: var(--radius-lg);
-      padding: 30px;
+      padding: 20px;
       flex-grow: 1;
       overflow-y: auto;
       line-height: 1.6;
@@ -118,8 +118,8 @@
 
     p {
       color: var(--text-secondary);
-      font-size: 14px;
-      margin: 8px 0;
+      font-size: 16px;
+      margin: 12px 0;
     }
 
     /* 6. ボタンスタイル */
@@ -127,7 +127,7 @@
       border: none;
       border-radius: var(--radius-md);
       font-weight: 600;
-      font-size: 14px;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
       position: relative;
@@ -256,13 +256,13 @@
     
     .chat-messages {
       flex-grow: 1;
-      max-height: 380px;
-      min-height: 300px;
+      max-height: 320px;
+      min-height: 240px;
       overflow-y: auto;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       background: var(--surface);
       border-radius: var(--radius-lg);
-      padding: 24px;
+      padding: 16px;
       border: 2px solid var(--border-color);
     }
     
@@ -271,7 +271,7 @@
       max-width: 80%;
       word-wrap: break-word;
       animation: slideIn 0.3s ease-out;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.6;
     }
 
@@ -357,10 +357,10 @@
     
     .chat-input-area {
       display: flex;
-      gap: 16px;
+      gap: 12px;
       align-items: stretch;
       background: var(--surface);
-      padding: 20px;
+      padding: 16px;
       border-radius: var(--radius-lg);
       border: 2px solid var(--border-color);
     }
@@ -410,25 +410,25 @@
     /* 9. 状態表示 */
     #status {
       background: var(--surface);
-      padding: 8px 12px;
+      padding: 10px 16px;
       border-radius: var(--radius-md);
-      font-size: 12px;
+      font-size: 14px;
       color: var(--text-secondary);
       text-align: center;
       border: 1px solid var(--border-color);
     }
 
     #model-info {
-      font-size: 11px;
+      font-size: 13px;
       color: var(--text-muted);
       font-style: italic;
     }
 
     .tts-status {
       background: var(--surface);
-      padding: 8px 12px;
+      padding: 10px 16px;
       border-radius: var(--radius-md);
-      font-size: 12px;
+      font-size: 14px;
       text-align: center;
       border: 1px solid var(--border-color);
       margin-top: 8px;
@@ -539,21 +539,19 @@
     }
 
     /* レスポンシブ対応 */
-    @media (max-width: 900px) {
+    @media (max-width: 420px) {
       .chat-messages {
-        max-height: 300px;
-        min-height: 250px;
-      }
-    }
-
-    @media (min-width: 1200px) {
-      .chat-messages {
-        max-height: 500px;
-        min-height: 400px;
+        max-height: 200px;
+        min-height: 180px;
+        padding: 12px;
       }
       
       .main-content {
-        padding: 40px;
+        padding: 16px;
+      }
+      
+      .header {
+        padding: 12px;
       }
     }
   </style>

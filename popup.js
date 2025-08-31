@@ -39,11 +39,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const startSummarization = () => {
     summaryDiv.innerHTML = '';
     statusP.textContent = 'ページのテキストを取得中...';
-    modelInfoP.textContent = '';
+    if (modelInfoP) modelInfoP.textContent = '';
     summarizeBtn.disabled = true;
     summarizeBtn.textContent = '要約中...';
     // ★ボタン類をすべて非表示にする
-    ttsControls.style.display = 'none';
+    if (ttsControls) ttsControls.style.display = 'none';
     chrome.runtime.sendMessage({ action: 'summarize' });
   };
 
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (summaryText) {
     summaryDiv.innerHTML = converter.makeHtml(summaryText);
     statusP.textContent = fromSelection ? '選択範囲の要約結果です。' : '前回の要約結果を表示しています。';
-    ttsControls.style.display = 'flex';
+    if (ttsControls) ttsControls.style.display = 'flex';
   } else if (!fromSelection) {
     // 選択要約起点 (#selection) でない場合のみ自動要約
     startSummarization();
@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       summarizeBtn.textContent = 'このページを再度要約する';
       
       // ★要約完了時に、すべてのコントロールを表示する
-      ttsControls.style.display = 'flex';
-      playBtn.style.display = 'none';
-      stopBtn.style.display = 'block';
+      if (ttsControls) ttsControls.style.display = 'flex';
+      if (playBtn) playBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'block';
 
     } else if (message.action === 'updateStatus') {
       // TTSメッセージかチェック
@@ -98,32 +98,38 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     } else if (message.action === 'modelInfo') {
       const modelLabel = message.model ? ` ${message.model}` : '';
-      modelInfoP.textContent = `使用モデル: ${message.provider}${modelLabel}`;
+      if (modelInfoP) modelInfoP.textContent = `使用モデル: ${message.provider}${modelLabel}`;
     } else if (message.type === 'tts-finished') {
-      playBtn.style.display = 'block';
-      stopBtn.style.display = 'none';
+      if (playBtn) playBtn.style.display = 'block';
+      if (stopBtn) stopBtn.style.display = 'none';
       hideTTSStatus();
     } else if (message.action === 'slackStatus') {
-      slackStatusP.textContent = message.status;
-      setTimeout(() => { slackStatusP.textContent = ''; }, 3000);
+      if (slackStatusP) {
+        slackStatusP.textContent = message.status;
+        setTimeout(() => { if (slackStatusP) slackStatusP.textContent = ''; }, 3000);
+      }
     }
   });
 
   // --- イベントリスナー ---
   summarizeBtn.addEventListener('click', startSummarization);
 
-  playBtn.addEventListener('click', () => {
-    const textToRead = summaryDiv.innerText;
-    console.log('POPUP: Play button clicked. Sending start-tts message with text:', textToRead);
-    chrome.runtime.sendMessage({ type: 'start-tts', text: textToRead });
-    playBtn.style.display = 'none';
-    stopBtn.style.display = 'block';
-  });
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      const textToRead = summaryDiv.innerText;
+      console.log('POPUP: Play button clicked. Sending start-tts message with text:', textToRead);
+      chrome.runtime.sendMessage({ type: 'start-tts', text: textToRead });
+      playBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'block';
+    });
+  }
 
-  stopBtn.addEventListener('click', () => {
-    console.log('POPUP: Stop button clicked. Sending stop-tts message.');
-    chrome.runtime.sendMessage({ type: 'stop-tts' });
-  });
+  if (stopBtn) {
+    stopBtn.addEventListener('click', () => {
+      console.log('POPUP: Stop button clicked. Sending stop-tts message.');
+      chrome.runtime.sendMessage({ type: 'stop-tts' });
+    });
+  }
   
   // slackBtn.addEventListener('click', () => {
   //   const summaryText = summaryDiv.innerText;
