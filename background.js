@@ -516,9 +516,12 @@ async function callApi(apiUrl, apiKey, text, model = null) {
     headers['Authorization'] = `Bearer ${apiKey}`;
   }
 
+  // システムプロンプトを設定から取得
+  const systemPrompt = await getSystemPrompt();
+
   const requestBody = {
     messages: [
-      { role: 'system', content: 'あなたは文章を要約する優秀なアシスタントです。以下の文章を日本語で簡潔に、重要なポイントを3〜5点にまとめてください。' },
+      { role: 'system', content: systemPrompt },
       { role: 'user', content: text }
     ],
     stream: false
@@ -574,8 +577,13 @@ async function handleChatRequest(message, tabId) {
     // チャット履歴を取得
     const chatHistory = await getChatHistory(tabId);
     
+    // 設定からシステムプロンプトを取得
+    const baseSystemPrompt = await getSystemPrompt();
+    
     // システムプロンプト + ページコンテキスト + チャット履歴 + 新しいメッセージ
-    const systemPrompt = `あなたは親切なアシスタントです。以下のウェブページの内容について、日本語で質問に答えてください。
+    const systemPrompt = `${baseSystemPrompt}
+
+以下のウェブページの内容について、日本語で質問に答えてください。
 
 ページの内容:
 ${pageContext}
@@ -846,6 +854,20 @@ async function startTTS(text) {
       status: `エラー: ${userMessage}` 
     });
   }
+}
+
+// システムプロンプトを取得する関数
+async function getSystemPrompt() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(['system_prompt'], (result) => {
+      if (result.system_prompt) {
+        resolve(result.system_prompt);
+      } else {
+        // デフォルトのシステムプロンプト
+        resolve('あなたはWebページの内容について日本語で要約するアシスタントです。要約は分かりやすく、重要なポイントを箇条書きで記述してください。');
+      }
+    });
+  });
 }
 
 // チャット用のLLM呼び出し関数

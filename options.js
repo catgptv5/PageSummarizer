@@ -6,6 +6,7 @@ const slackAutoInput = document.getElementById('slack-auto');
 const autoTtsChatInput = document.getElementById('auto-tts-chat');
 const openaiModelInput = document.getElementById('openai-model');
 const aivisModelInput = document.getElementById('aivis-model');
+const systemPromptInput = document.getElementById('system-prompt');
 const saveBtn = document.getElementById('save-btn');
 const statusDiv = document.getElementById('status');
 
@@ -18,7 +19,8 @@ saveBtn.addEventListener('click', () => {
     slack_auto_send: !!slackAutoInput.checked,
     auto_tts_chat: !!autoTtsChatInput.checked,
     openai_model: openaiModelInput.value,
-    aivis_model_uuid: aivisModelInput.value
+    aivis_model_uuid: aivisModelInput.value,
+    system_prompt: systemPromptInput.value
   };
 
   chrome.storage.local.set(settings, () => {
@@ -40,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'slack_auto_send',
     'auto_tts_chat',
     'openai_model',
-    'aivis_model_uuid'
+    'aivis_model_uuid',
+    'system_prompt'
   ];
   chrome.storage.local.get(keysToGet, (result) => {
     if (result.openai_api_key) {
@@ -70,6 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (result.aivis_model_uuid) {
       aivisModelInput.value = result.aivis_model_uuid;
+    }
+    if (result.system_prompt) {
+      systemPromptInput.value = result.system_prompt;
+    } else {
+      // デフォルトのシステムプロンプト
+      systemPromptInput.value = 'あなたはWebページの内容について日本語で要約するアシスタントです。要約は分かりやすく、重要なポイントを箇条書きで記述してください。';
     }
   });
 });

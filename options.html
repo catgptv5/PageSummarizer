@@ -22,10 +22,16 @@
     label {
       font-weight: bold;
     }
-    input[type="text"], input[type="password"], select {
+    input[type="text"], input[type="password"], select, textarea {
       width: 100%;
       padding: 8px;
       box-sizing: border-box;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 13px;
     }
     button {
       padding: 10px 15px;
@@ -113,6 +119,10 @@
     <div class="input-group">
       <label for="aivis-model">AIVIS 読み上げモデルUUID:</label>
       <input type="text" id="aivis-model" placeholder="f5017410-fbb5-49e1-97cb-e785f42e15f5">
+    </div>
+    <div class="input-group">
+      <label for="system-prompt">システムプロンプト:</label>
+      <textarea id="system-prompt" placeholder="あなたはWebページの内容について日本語で要約するアシスタントです。要約は分かりやすく、重要なポイントを箇条書きで記述してください。"></textarea>
     </div>
     
     <!-- トラブルシューティング情報 -->
